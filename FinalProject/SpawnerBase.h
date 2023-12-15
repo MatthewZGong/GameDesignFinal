@@ -19,6 +19,8 @@ const char ENTITY_TILESET2_FILEPATH[] = "resources/entity_tiles_2.png";
 
 const char FIRE_TILESET1_FILEPATH[] = "resources/FireEffect.png";
 
+const char CASTLE_TILESET1_FILEPATH[] = "resources/CastleTile.png";
+
 enum SoilderType { KNIGHT, ORC, SLIME, BAT, WIZARD };
 enum SpawnerAI { NO_AI, FLYING, EVERYTHING };
 

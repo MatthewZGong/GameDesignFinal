@@ -255,16 +255,16 @@ void SpawnerBase::ai_action(){
 
     }else if(aitype == EVERYTHING){
         int r = -1;
-        if(frames_alive%333 == 0){
+        if(frames_alive%222 == 0){
             int r = (rand()%3);
         }
-        if(r == 0 || frames_alive%200 == 0){
+        if(r == 0 || frames_alive%100 == 0){
             spawn(SLIME);
         }
-        if(r == 1 || frames_alive%500 == 0){
+        if(r == 1 || frames_alive%400 == 0){
             spawn(BAT);
         }
-        if(r == 2 || frames_alive%1000 == 0){
+        if(r == 2 || frames_alive%700 == 0){
             spawn(ORC);
         }
 
@@ -345,8 +345,8 @@ void SpawnerBase::spawn(SoilderType st){
         soldiers.push_back(new Knight(m_position, y_direction_facing, unit_texture_id));
     }
     else if(st == WIZARD){
-        if(gold < 50) return;
-        gold -= 50;
+        if(gold < 0) return;
+        gold -= 0;
         soldiers.push_back(new Wizard(m_position, y_direction_facing, unit_texture_id));
     }
     else if(st == ORC)
@@ -418,7 +418,7 @@ Hero::Hero(glm::vec3 position, float direction, GLuint texture_id): attack_entit
 void Hero::Hero::receive_attack(AttackInfo a)
 {
     health -= a.dmg;
-    m_position.x += -(move_direction)*a.knock_back;
+//    m_position.x += -(move_direction)*a.knock_back;
     if(health < 0){
         health = 0;
     }
@@ -638,7 +638,7 @@ Wizard::Wizard(glm::vec3 position, float direction, GLuint texture_id){
     m_animation_time = 0.0f;
     m_width = 0.8f;
     m_height = 0.8f;
-    attack_entity = new FireBall(10,direction);
+    attack_entity = new FireBall(200,direction);
     attack_entity->attackInfo = {100, 0.3};
 }
 Wizard::~Wizard(){
@@ -727,7 +727,7 @@ FireBall::FireBall(int cd, float direction): AttackEntity(cd, direction){
     m_is_active = false;
     y_direction_facing = direction;
     
-    m_speed = 2.0;
+    m_speed = 5.0;
     death_animation = new AnimationInfo;
     death_animation->index = 0;
     death_animation->animation_rows = 13;
@@ -739,15 +739,16 @@ FireBall::FireBall(int cd, float direction): AttackEntity(cd, direction){
     
 }
 void FireBall::update(float delta_time, Entity* main_spawn, std::vector<Entity*>& collidable_entities, Map* map){
-
+//    std::cout << timer << std::endl;
     // ––––– ANIMATION ––––– //
-    if(!explode)
-        m_movement.x = y_direction_facing*1.0;
+//    std::cout  << m_movement.x << " " << m_movement.y << std::endl;
+//    if(!explode)
+//        m_movement.x = y_direction_facing*1.0;
     bool hit = check_collision(main_spawn);
     for(Entity* e: collidable_entities){
         hit = hit || check_collision(e);
     }
-    if(hit && !explode){
+    if(hit && !explode || frames_alive > 1000 ){
         for(Entity* e: collidable_entities){
             if(check_collision(e)){
                 e->receive_attack(attackInfo);
@@ -791,6 +792,7 @@ void FireBall::update(float delta_time, Entity* main_spawn, std::vector<Entity*>
 
             if (m_animation_time >= frames_per_second)
             {
+                frames_alive++;
                 m_animation_time = 0.0f;
                 m_animation_index++;
                 timer--;
@@ -804,8 +806,9 @@ void FireBall::update(float delta_time, Entity* main_spawn, std::vector<Entity*>
         }
     }
     m_velocity.x = m_movement.x * m_speed;
+    m_velocity.y = m_movement.y * m_speed;
     m_position.x += m_velocity.x * delta_time;
-
+    m_position.y += m_velocity.y * delta_time;
     m_model_matrix = glm::mat4(1.0f);
     m_model_matrix = glm::translate(m_model_matrix, m_position);
 }
@@ -830,9 +833,18 @@ void FireBall::set_active(glm::vec3 position, float move_direction, std::vector<
     explode = false;
     m_animation_index = 0;
     m_position = position;
-    m_movement.x = move_direction*1.0;
+    if(attacking.size() > 0 && attacking[0] != NULL){
+        glm::vec3 direction = attacking[0]->get_position()-position;
+        direction = glm::normalize(direction);
+        m_movement = direction;
+//        std::cout  << "Start: " << m_movement.x << " " << m_movement.y << std::endl;
+        y_direction_facing = m_movement.x == 1 ? -1 : 1;
+    }else{
+        m_movement.x = move_direction*1.0;
+    }
     death_animation->index = 0;
     timer = cooldown;
+    frames_alive = 0;
 //    for(Entity* e: attacking){
 //        e->receive_attack(attackInfo);
 //    }
