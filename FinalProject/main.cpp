@@ -204,9 +204,12 @@ void process_input()
                 // Quit the game with a keystroke
                 g_game_is_running = false;
                 break;
+            case SDLK_x:
+                    if(g_current_scene->g_game_state.player2 != NULL)
+                    g_current_scene->g_game_state.player->attack(g_current_scene->g_game_state.player2, g_current_scene->g_game_state.player2->get_soilders());
+                break;
 
             case SDLK_SPACE:
-                // Jump
                 if (!g_game_paused && g_current_scene->g_game_state.player->m_collided_bottom)
                 {
                     g_current_scene->g_game_state.player->m_is_jumping = true;
@@ -271,8 +274,10 @@ void update()
     
     while (delta_time >= FIXED_TIMESTEP) {
         g_current_scene->update(FIXED_TIMESTEP);
-        if( g_current_scene->g_game_state.player->get_dead())
+        if( (g_current_scene->g_game_state.player != NULL && g_current_scene->g_game_state.player->get_dead()) || (g_current_scene->g_game_state.player1 != NULL && g_current_scene->g_game_state.player1->get_dead()))
             g_current_scene->g_game_state.state = 2;
+        if( (g_current_scene->g_game_state.player2 != NULL && g_current_scene->g_game_state.player2->get_dead()))
+            g_current_scene->g_game_state.state = 1;
         delta_time -= FIXED_TIMESTEP;
         g_effects->update(FIXED_TIMESTEP);
 
@@ -334,11 +339,14 @@ int main(int argc, char* argv[])
 
     while (g_game_is_running)
     {
-        
-        process_input();
-        update();
-        render();
         manage_scene();
+        process_input();
+        render();
+
+        if(!g_game_paused ){
+            update();
+        }
+        
     }
 
     shutdown();

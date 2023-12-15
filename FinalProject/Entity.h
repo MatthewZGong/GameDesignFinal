@@ -9,8 +9,7 @@
 **/
 #include "Map.h"
 enum EntityType { PLATFORM, PLAYER, ENEMY, END_GOAL};
-enum AIType     { WALKER, GUARD, FLY, RAM   };
-enum AIState    { WALKING, IDLE, ATTACKING  };
+
 
 const char UNIT_TILESET_FILEPATH[] = "resources/entity_tiles.png";
 
@@ -25,9 +24,21 @@ struct AttackInfo{
     int dmg;
     float knock_back;
 };
+
+struct AnimationInfo{
+    std::vector<int> animation_indices;
+    int animation_cols;
+    int animation_rows;
+    int index = 0;
+    GLuint texture;
+};
+
 class Entity
 {
 protected:
+    
+    int gold;
+    int gold_generation;
     bool m_is_active = true;
     float y_direction_facing = 1.0f;
 
@@ -36,7 +47,7 @@ protected:
         * m_animation_left = NULL, // move to the left
         * m_animation_up   = NULL, // move upwards
         * m_animation_down = NULL; // move downwards
-
+    
 
     // ––––– PHYSICS (GRAVITY) ––––– //
     glm::vec3 m_position;
@@ -51,18 +62,20 @@ protected:
 
     // ————— ENEMY AI ————— //
     EntityType m_entity_type;
-    AIType     m_ai_type;
-    AIState    m_ai_state;
+
 
     float m_width = 1;
     float m_height = 1;
     
-    bool m_dead;
+    bool m_dead = false;
     
-    AttackInfo attackInfo;
 
+
+    AnimationInfo* death_animation;
 
 public:
+    
+    AttackInfo attackInfo;
     // ————— STATIC VARIABLES ————— //
     static const int SECONDS_PER_FRAME = 4;
     static const int    LEFT = 0,
@@ -78,6 +91,8 @@ public:
         m_animation_index = 0,
         m_animation_cols = 0,
         m_animation_rows = 0;
+    
+
 
     int*    m_animation_indices = NULL;
     float   m_animation_time = 0.0f;
@@ -124,8 +139,8 @@ public:
     virtual void receive_attack(AttackInfo a);
     virtual void decide_action(Entity* enemy_camp,std::vector<Entity*>& enemies);
 
-    void move_left()    { m_movement.x = -1.0f; };
-    void move_right()   { m_movement.x = 1.0f; };
+    void move_left()    { m_movement.x = -1.0f; y_direction_facing = -1.0f; };
+    void move_right()   { m_movement.x = 1.0f; y_direction_facing = 1.0f; };
     void move_up()      { m_movement.y = 1.0f; };
     void move_down()    { m_movement.y = -1.0f; };
 
@@ -142,8 +157,6 @@ public:
 
     // ————— GETTERS ————— //
     EntityType const get_entity_type()    const { return m_entity_type;     };
-    AIType     const get_ai_type()        const { return m_ai_type;         };
-    AIState    const get_ai_state()       const { return m_ai_state;        };
     glm::vec3  const get_position()       const { return m_position;        };
     glm::vec3  const get_movement()       const { return m_movement;        };
     glm::vec3  const get_velocity()       const { return m_velocity;        };
@@ -157,8 +170,7 @@ public:
 
     // ————— SETTERS ————— //
     void const set_entity_type(EntityType new_entity_type)  { m_entity_type = new_entity_type;      };
-    void const set_ai_type(AIType new_ai_type)              { m_ai_type = new_ai_type;              };
-    void const set_ai_state(AIState new_state)              { m_ai_state = new_state;               };
+
     void const set_position(glm::vec3 new_position)         { m_position = new_position;            };
     void const set_movement(glm::vec3 new_movement)         { m_movement = new_movement;            };
     void const set_velocity(glm::vec3 new_velocity)         { m_velocity = new_velocity;            };
@@ -168,5 +180,7 @@ public:
     void const set_width(float new_width)                   { m_width = new_width;                  };
     void const set_height(float new_height)                 { m_height = new_height;                };
     void const set_dead(bool new_dead)                 { m_dead = new_dead;                };
+    void const set_y_facing_direction(float dir)                 { y_direction_facing = dir;};
     
+    void addGold(int amount){gold += amount;};
 };

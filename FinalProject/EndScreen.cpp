@@ -20,13 +20,17 @@ EndScreen::EndScreen(int l){
 EndScreen::~EndScreen()
 {
     delete    g_game_state.player;
+    delete g_game_state.player1;
+    delete g_game_state.player2;
 //    Mix_FreeChunk(g_game_state.jump_sfx);
 //    Mix_FreeMusic(g_game_state.bgm);
 }
 
 void EndScreen::initialise()
 {
-    g_game_state.player = new Entity();
+    g_game_state.player = new Hero();
+    g_game_state.player1 = new SpawnerBase(true, 1);
+    g_game_state.player2 = new SpawnerBase(false, 1);
     g_game_state.state = 0;
 
 }

@@ -45,6 +45,7 @@ void AttackEntity::update(float delta_time, Entity* main_spawn, std::vector<Enti
             m_animation_index++;
             timer--;
             timer = fmax(0, timer);
+//            std::cout << timer << std::endl;
             
 
             if (m_animation_index >= m_animation_frames)
@@ -62,11 +63,14 @@ void AttackEntity::update(float delta_time, Entity* main_spawn, std::vector<Enti
 void AttackEntity::render(ShaderProgram* program){
     
 //    m_model_matrix = glm::translate(m_model_matrix, m_position);
+    if(m_model_matrix != glm::translate(glm::mat4(1.0f), m_position)){
+        m_model_matrix = glm::translate(m_model_matrix, m_position);
+    }
     program->SetModelMatrix(m_model_matrix);
 
     if (m_is_active && m_animation_indices != NULL && m_animation_index < m_animation_frames)
     {
-        draw_sprite_from_texture_atlas(program, m_texture_id, m_animation_indices[m_animation_index]);
+        Entity::draw_sprite_from_texture_atlas(program, m_texture_id, m_animation_indices[m_animation_index]);
 
     }
 }
@@ -75,7 +79,9 @@ void AttackEntity::set_active(glm::vec3 position, float move_direction, std::vec
     if(timer != 0) return;
     m_is_active = true;
     m_animation_index = 0;
+
     m_position = position+glm::vec3(1.0*move_direction,0,0);
+//    std::cout << position.x << " " << m_position.x << std::endl;
     timer = cooldown;
     for(Entity* e: attacking){
         e->receive_attack(attackInfo);
@@ -83,56 +89,93 @@ void AttackEntity::set_active(glm::vec3 position, float move_direction, std::vec
 }
 
 Unit::~Unit(){
+    delete death_animation;
+}
+
+Unit::Unit(){
+    worth = 10;
+    m_dead = false;
+    death_animation = new AnimationInfo;
+    death_animation->index = 0;
+    death_animation->animation_rows = 9;
+    death_animation->animation_cols = 28;
+    death_animation->animation_indices = {62, 63, 64, 65};
+    death_animation->texture = Utility::load_texture(ENTITY_TILESET2_FILEPATH);
+}
+
+void Unit::update(float delta_time, Entity* main_spawn, std::vector<Entity*>& collidable_entities, Map* map){
+    
+    // –––––Death ANIMATION ––––– //
+    if(!m_is_active) return;
+    // ––––– ANIMATION ––––– //
+    if (health <= 0)
+    {
+        m_animation_time += delta_time;
+        float frames_per_second = (float)1 / SECONDS_PER_FRAME;
+
+        if (m_animation_time >= frames_per_second)
+        {
+            death_animation->index++;
+        }
+        if(death_animation->index >= death_animation->animation_indices.size()){
+            main_spawn->addGold(worth);
+            m_is_active = false;
+            m_dead = true;
+        }
+        m_model_matrix = glm::mat4(1.0f);
+        m_model_matrix = glm::translate(m_model_matrix, m_position);
+    
+        return;
+    }
+    
+    Entity::update(delta_time, main_spawn, collidable_entities, map);
+}
+
+void Unit::render(ShaderProgram* program){
+    if(!m_is_active) return;
+    if(health <= 0){
+        //this is scuffed i was being lazy
+
+        program->SetModelMatrix(m_model_matrix);
+        std::swap(m_animation_rows, death_animation->animation_rows);
+        std::swap(m_animation_cols, death_animation->animation_cols);
+        draw_sprite_from_texture_atlas(program, death_animation->texture, death_animation->animation_indices[death_animation->index]);
+        std::swap(m_animation_rows, death_animation->animation_rows);
+        std::swap(m_animation_cols, death_animation->animation_cols);
+        return;
+    }
+    
+    Entity::render(program);
+    
+//    swap(m_animation_rows, death_animation->animation_rows);
+//    swap(m_animation_cols, death_animation->animation_cols);
+//    swap(m_texture_id, death_animation->texture);
+}
+
+BasicMelee::BasicMelee(int cd, float direction): attack_entity(cd, direction){
+    
+}
+BasicMelee::~BasicMelee(){
     
 }
 
 
 
-Knight::~Knight(){
-    
-}
 
-
-Knight::Knight(glm::vec3 position, float direction, GLuint texture_id): attack_entity(6, direction)
-{
-    
-    attack_range = 0.8f;
-
-    health = 100;
-    m_texture_id = texture_id;
-    move_direction = float(direction);
-    y_direction_facing = float(direction);
-    Entity::set_position(position);
-    Entity::set_movement(glm::vec3(0.0f));
-    Entity::set_speed(1.0f);
-    Entity::set_acceleration(glm::vec3(0.0f, -9.81f, 0.0f));
-    m_animation_cols = 32;
-    m_animation_rows = 32;
-    m_animation_indices = new int[3] {168,174, 175};
-    m_animation_hat = new int[3] {136, 142, 143};
-    m_animation_frames = 3;
-    m_animation_index = 0;
-    m_animation_time = 0.0f;
-    m_width = 0.6f;
-    m_height = 0.6f;
-    
-
-}
-
-void Knight::Knight::receive_attack(AttackInfo a)
+void BasicMelee::receive_attack(AttackInfo a)
 {
     health -= a.dmg;
     m_position.x += -(move_direction)*a.knock_back;
     if(health < 0){
         health = 0;
-        m_is_active = false;
     }
+    
 }
 
-void Knight::decide_action(Entity* enemy_camp, std::vector<Entity*>&
+void BasicMelee::decide_action(Entity* enemy_camp, std::vector<Entity*>&
                            enemies)
 {
-    if(!m_is_active) return;
+    if(!m_is_active || health <= 0) return;
     m_movement = glm::vec3(0.0);
     Entity* closest = NULL;
     float distances = 1e9;
@@ -168,14 +211,14 @@ void Knight::decide_action(Entity* enemy_camp, std::vector<Entity*>&
     }
     
 }
-void Knight::render_effects(ShaderProgram *program)
+void BasicMelee::render_effects(ShaderProgram *program)
 {
 //    std::cout << "i am rendering" << std::endl;
     
     attack_entity.render(program);
 }
 
-void Knight::update_effects(float delta_time, Entity* main_spawn, std::vector<Entity*>& collidable_entities, Map* map){
+void BasicMelee::update_effects(float delta_time, Entity* main_spawn, std::vector<Entity*>& collidable_entities, Map* map){
     attack_entity.update(delta_time, main_spawn, collidable_entities, map);
 };
 
@@ -197,6 +240,7 @@ SpawnerBase::~SpawnerBase(){
 
 
 void SpawnerBase::update(float delta_time, SpawnerBase* EnemyCamp, Map* map){
+    
     std::vector<Entity*>& enemies = EnemyCamp->get_soilders();
 
     //this is scuffed but im lazy
@@ -209,6 +253,9 @@ void SpawnerBase::update(float delta_time, SpawnerBase* EnemyCamp, Map* map){
     }
     m_model_matrix = glm::mat4(1.0f);
     m_model_matrix = glm::translate(m_model_matrix, m_position);
+    std::vector<Entity*> temp;
+    Unit::update(delta_time, EnemyCamp, temp, map);
+//    std::cout << "GOLD: " << gold << " " << y_direction_facing << std::endl;
 }
 void SpawnerBase::draw_sprite_from_texture_atlas(ShaderProgram* program, GLuint texture_id, int index)
 {
@@ -227,12 +274,6 @@ void SpawnerBase::draw_sprite_from_texture_atlas(ShaderProgram* program, GLuint 
         u_coord, v_coord + height, u_coord + width, v_coord, u_coord, v_coord
     };
 
-//    float vertices[] =
-//    {
-//        floa1.0, -1.0, -1.0, -1.0,  -1.0, 1.0,
-//        1.0, -1.0, -1.0,  1.0, 1.0, 1.0
-//
-//    };
     float vertices[] =
     {
         float(y_direction_facing)*-1.0f, -1.0f, float(y_direction_facing)*1.0f, -1.0f,  float(y_direction_facing)*1.0f, 1.0f,
@@ -259,20 +300,27 @@ void SpawnerBase::draw_sprite_from_texture_atlas(ShaderProgram* program, GLuint 
 }
 
 void SpawnerBase::render(ShaderProgram* program){
-    Entity::render(program);
+    Unit::render(program);
     for(int i =0; i < soldiers.size(); i++){
         soldiers[i]->render(program);
     }
 }
 
-void SpawnerBase::spawn(){
-    soldiers.push_back(new Knight(m_position, y_direction_facing, unit_texture_id));
+void SpawnerBase::spawn(SoilderType st){
+    if(st == KNIGHT)
+        soldiers.push_back(new Knight(m_position, y_direction_facing, unit_texture_id));
+    else if(st == ORC)
+        soldiers.push_back(new Orc(m_position, y_direction_facing, unit_texture_id));
+    else if(st == SLIME)
+        soldiers.push_back(new Slime(m_position, y_direction_facing, unit_texture_id));
+    else if(st == BAT)
+        soldiers.push_back(new Bat(m_position, y_direction_facing, unit_texture_id));
 }
 
 void SpawnerBase::receive_attack(AttackInfo a){
     health -= a.dmg;
     if(health < 0){
-        m_is_active = false;
+//        m_is_active = false;
         health = 0;
     }
 }
@@ -283,3 +331,248 @@ void SpawnerBase::render_attacks(ShaderProgram* program){
     }
 }
 
+Hero* SpawnerBase::addHero(glm::vec3 position, float direction, GLuint texture_id){
+    Hero* h = new Hero(position, direction, texture_id);
+    soldiers.push_back(h);
+    return h;
+}
+
+
+Hero::~Hero(){
+    m_dead = false;
+}
+
+Hero::Hero(): attack_entity(1, -1.0) {
+    
+}
+
+Hero::Hero(glm::vec3 position, float direction, GLuint texture_id): attack_entity(4, direction)
+{
+    
+    
+
+    
+    health = 200;
+    attack_range = 1.5f;
+    m_texture_id = texture_id;
+    move_direction = float(direction);
+    y_direction_facing = float(direction);
+    Entity::set_position(position);
+    Entity::set_movement(glm::vec3(0.0f));
+    Entity::set_speed(1.5f);
+    Entity::set_acceleration(glm::vec3(0.0f, -9.81f, 0.0f));
+    m_animation_cols = 32;
+    m_animation_rows = 32;
+    m_animation_indices = new int[3] {104,110, 111};
+    m_animation_hat = new int[3] {72, 78, 79};
+    m_animation_frames = 3;
+    m_animation_index = 0;
+    m_animation_time = 0.0f;
+    m_width = 0.6f;
+    m_height = 0.6f;
+    set_jumping_power(6.0f);
+    
+    attack_entity.attackInfo = {75, 1.0};
+}
+
+void Hero::Hero::receive_attack(AttackInfo a)
+{
+    health -= a.dmg;
+    m_position.x += -(move_direction)*a.knock_back;
+    if(health < 0){
+        health = 0;
+    }
+    
+}
+
+void Hero::render_effects(ShaderProgram *program)
+{    
+    attack_entity.render(program);
+}
+
+void Hero::update_effects(float delta_time, Entity* main_spawn, std::vector<Entity*>& collidable_entities, Map* map){
+    attack_entity.update(delta_time, main_spawn, collidable_entities, map);
+};
+
+
+void Hero::attack(Entity* enemy_camp, std::vector<Entity*>&
+                  enemies){
+    Entity* closest = NULL;
+    float distances = 1e9;
+    if(enemy_camp != NULL && enemy_camp->get_active())
+    {
+        closest = enemy_camp;
+        auto [left,right] =enemy_camp->get_x_boundary();
+        distances = glm::distance(m_position, left);
+        distances = fmin(distances, glm::distance(m_position, right));
+    }
+    for(Entity* e: enemies)
+    {
+        if(e->get_active())
+        {
+
+            auto [left,right] = e->get_x_boundary();
+            float cur_dist = glm::distance(m_position, left);
+            cur_dist =  fmin(cur_dist, glm::distance(m_position, right));
+            if(cur_dist < distances){
+                distances = cur_dist;
+                closest = e;
+            }
+        }
+    }
+    
+
+    if(!attack_entity.get_active()){
+        attack_entity.set_y_facing_direction(y_direction_facing);
+        if(distances < attack_range)
+            attack_entity.set_active(m_position,y_direction_facing,  {closest});
+        else
+            attack_entity.set_active(m_position,y_direction_facing,  {});
+
+    }
+
+}
+
+
+Knight::Knight(glm::vec3 position, float direction, GLuint texture_id): BasicMelee(6, direction)
+{
+    
+    attack_range = 0.8f;
+    health = 100;
+    m_texture_id = texture_id;
+    move_direction = float(direction);
+    y_direction_facing = float(direction);
+    Entity::set_position(position);
+    Entity::set_movement(glm::vec3(0.0f));
+    Entity::set_speed(1.0f);
+    Entity::set_acceleration(glm::vec3(0.0f, -9.81f, 0.0f));
+    m_animation_cols = 32;
+    m_animation_rows = 32;
+    m_animation_indices = new int[3] {168,174, 175};
+    m_animation_hat = new int[3] {136, 142, 143};
+    m_animation_frames = 3;
+    m_animation_index = 0;
+    m_animation_time = 0.0f;
+    m_width = 0.6f;
+    m_height = 0.6f;
+}
+
+
+Orc::Orc(glm::vec3 position, float direction, GLuint texture_id): BasicMelee(9, direction)
+{
+    
+    attack_range = 0.8f;
+    health = 100;
+    m_texture_id = texture_id;
+    move_direction = float(direction);
+    y_direction_facing = float(direction);
+    Entity::set_position(position);
+    Entity::set_movement(glm::vec3(0.0f));
+    Entity::set_speed(1.0f);
+    Entity::set_acceleration(glm::vec3(0.0f, -9.81f, 0.0f));
+    m_animation_cols = 32;
+    m_animation_rows = 32;
+    m_animation_indices = new int[3] {343,349, 350};
+//    m_animation_hat = new int[3] {136, 142, 143};
+    m_animation_frames = 3;
+    m_animation_index = 0;
+    m_animation_time = 0.0f;
+    m_width = 0.6f;
+    m_height = 0.6f;
+    attack_entity.attackInfo = {45, 1.0};
+}
+
+Slime::Slime(glm::vec3 position, float direction, GLuint texture_id): BasicMelee(4, direction)
+{
+    
+    attack_range = 0.8f;
+    worth = 2;
+    health = 20;
+    m_texture_id = texture_id;
+    move_direction = float(direction);
+    y_direction_facing = float(direction);
+    Entity::set_position(position);
+    Entity::set_movement(glm::vec3(0.0f));
+    Entity::set_speed(2.0f);
+    Entity::set_acceleration(glm::vec3(0.0f, -9.81f, 0.0f));
+    m_animation_cols = 32;
+    m_animation_rows = 32;
+    m_animation_indices = new int[4] {251,252,253, 254};
+    m_animation_frames = 4;
+    m_animation_index = 0;
+    m_animation_time = 0.0f;
+    m_width = 0.6f;
+    m_height = 0.6f;
+    attack_entity.attackInfo = {20, 0.0};
+}
+
+
+Bat::Bat(glm::vec3 position, float direction, GLuint texture_id): BasicMelee(4, direction)
+{
+    
+    attack_range = 0.8f;
+    worth = 2;
+    health = 20;
+    m_texture_id = texture_id;
+    move_direction = float(direction);
+    y_direction_facing = float(direction);
+    position.y += 1.5f;
+    Entity::set_position(position);
+    Entity::set_movement(glm::vec3(0.0f));
+    Entity::set_speed(2.0f);
+    Entity::set_acceleration(glm::vec3(0.0f, 0.0f, 0.0f));
+    m_animation_cols = 32;
+    m_animation_rows = 32;
+    m_animation_indices = new int[3] {120,121,122};
+    m_animation_hat = new int[3] {88,89,90};
+    m_animation_frames = 3;
+    m_animation_index = 0;
+    m_animation_time = 0.0f;
+    m_width = 0.8f;
+    m_height = 0.8f;
+    attack_entity.attackInfo = {20, 0.0};
+}
+
+
+void Bat::decide_action(Entity* enemy_camp, std::vector<Entity*>&
+                                    enemies)
+{
+    if(!m_is_active || health <= 0) return;
+    m_movement = glm::vec3(0.0);
+    Entity* closest = NULL;
+    float distances = 1e9;
+
+    if(enemy_camp != NULL && enemy_camp->get_active())
+    {
+        closest = enemy_camp;
+        auto [left,right] =enemy_camp->get_x_boundary();
+        distances = glm::distance(m_position, left);
+        distances = fmin(distances, glm::distance(m_position, right));
+    }
+    for(Entity* e: enemies)
+    {
+        if(e->get_active())
+        {
+
+            auto [left,right] = e->get_x_boundary();
+            float cur_dist = glm::distance(m_position, left);
+            cur_dist =  fmin(cur_dist, glm::distance(m_position, right));
+            if(cur_dist < distances){
+                distances = cur_dist;
+                closest = e;
+            }
+        }
+    }
+//    std::cout << distances << std::endl;
+    if(distances < attack_range){
+        if(!attack_entity.get_active()){
+            attack_entity.set_active(m_position,move_direction,  {closest});
+
+        }
+    }else{
+        m_movement.x = 1.0*move_direction;
+    }
+    if( m_position.y > enemy_camp->get_position().y+0.75 && glm::distance(m_position, enemy_camp->get_position())  < 3.0 ){
+        m_movement.y = -0.5f;
+    }
+}

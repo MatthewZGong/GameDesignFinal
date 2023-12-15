@@ -15,18 +15,19 @@
 #define LEVEL_HEIGHT 5
 const int E = -1;
 
+
 int LEVEL_B_DATA[] =
 {
     E, E, E, E, E, E, E, E, E, E, E, E, E, E, E,
     E, E, E, E, E, E, E, E, E, E, E, E, E, E, E,
-    E, E, E, E, E, E, E, E, E, 1, 2, 2, 2, 2, 3,
-    21, 22, 22, 22, 22, 22, 22, 23, E, E, E, E, E, E, E,
-    4, 4, 4, 4, 4, 4, 4, 4, E, E, E, E, E, E, E
+    E, E, E, E, E, E, E, E, E, E, E, E, E, E, E,
+    21, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 23,
+    4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4
 };
 
 LevelB::LevelB(){
     g_number_of_enemies = 0;
-    g_game_state.next_scene_id = Level2;
+    g_game_state.next_scene_id = End;
     g_game_state.state = 0;
 
 }
@@ -34,8 +35,10 @@ LevelB::LevelB(){
 LevelB::~LevelB()
 {
     delete [] g_game_state.enemies;
-    delete    g_game_state.player;
+//    delete    g_game_state.player;
     delete    g_game_state.map;
+    delete g_game_state.player2;
+    delete g_game_state.player1;
     Mix_FreeChunk(g_game_state.jump_sfx);
     Mix_FreeMusic(g_game_state.bgm);
 }
@@ -64,11 +67,13 @@ void LevelB::initialise()
     g_game_state.player1->m_animation_index   = 0;
     g_game_state.player1->m_animation_time    = 0.0f;
 
-    g_game_state.player1->spawn();
+//    g_game_state.player1->spawn(KNIGHT);
+//    g_game_state.player1->spawn();
+
 
     
     g_game_state.player2 = new SpawnerBase(false, 100);
-    g_game_state.player2->set_position(glm::vec3(5.0f, -1.5f, 0.0f));
+    g_game_state.player2->set_position(glm::vec3(13.0f, -1.5f, 0.0f));
     g_game_state.player2->set_movement(glm::vec3(0.0f));
     g_game_state.player2->m_texture_id = entity_tileset_texture_id;
     g_game_state.player2->set_entity_type(PLAYER);
@@ -81,34 +86,38 @@ void LevelB::initialise()
     g_game_state.player2->m_animation_time    = 0.0f;
 
 
-    g_game_state.player2->spawn();
+    g_game_state.player2->spawn(ORC);
+    g_game_state.player2->spawn(SLIME);
+    g_game_state.player2->spawn(BAT);
+//    g_game_state.player2->spawn(SLIME);
+//    g_game_state.player2->spawn(SLIME);
 
     // ––––– PLAYER ––––– //
     // Existing
 
     
-    g_game_state.player = new Entity();
-    g_game_state.player->set_position(glm::vec3(0.0f, 2.0f, 0.0f));
-    g_game_state.player->set_movement(glm::vec3(0.0f));
-    g_game_state.player->set_speed(1.5f);
-    g_game_state.player->set_acceleration(glm::vec3(0.0f, -9.81f, 0.0f));
-    g_game_state.player->m_texture_id = entity_tileset_texture_id;
-    g_game_state.player->set_entity_type(PLAYER);
+    g_game_state.player = g_game_state.player1->addHero(glm::vec3(0.0f, 2.0f, 0.0f), 1, entity_tileset_texture_id);
+//    g_game_state.player->set_position(glm::vec3(0.0f, 2.0f, 0.0f));
+//    g_game_state.player->set_movement(glm::vec3(0.0f));
+//    g_game_state.player->set_speed(1.5f);
+//    g_game_state.player->set_acceleration(glm::vec3(0.0f, -9.81f, 0.0f));
+//    g_game_state.player->m_texture_id = entity_tileset_texture_id;
+//    g_game_state.player->set_entity_type(PLAYER);
+//
+//    g_game_state.player->m_animation_cols    = 32;
+//    g_game_state.player->m_animation_rows    = 32;
+//    g_game_state.player->m_animation_indices = new int[3] {104,110, 111};
+//    g_game_state.player->m_animation_hat = new int[3] {72, 78, 79};
+//    g_game_state.player->m_animation_frames  = 3;
+//    g_game_state.player->m_animation_index   = 0;
+//    g_game_state.player->m_animation_time    = 0.0f;
 
-    g_game_state.player->m_animation_cols    = 32;
-    g_game_state.player->m_animation_rows    = 32;
-    g_game_state.player->m_animation_indices = new int[3] {168,174, 175};
-    g_game_state.player->m_animation_hat = new int[3] {136, 142, 143};
-    g_game_state.player->m_animation_frames  = 3;
-    g_game_state.player->m_animation_index   = 0;
-    g_game_state.player->m_animation_time    = 0.0f;
 
-
-    g_game_state.player->set_height(0.9f);
-    g_game_state.player->set_width(0.9f);
+//    g_game_state.player->set_height(0.9f);
+//    g_game_state.player->set_width(0.9f);
 
     // Jumping
-    g_game_state.player->set_jumping_power(6.0f);
+//    g_game_state.player->set_jumping_power(6.0f);
 
     // ––––– ENEMY––––– //
 
@@ -130,7 +139,6 @@ void LevelB::initialise()
 
 void LevelB::update(float delta_time)
 {
-    g_game_state.player->update(delta_time, g_game_state.enemies, g_number_of_enemies, g_game_state.map);
     g_game_state.player1->update(delta_time, g_game_state.player2, g_game_state.map);
     g_game_state.player2->update(delta_time, g_game_state.player1, g_game_state.map);
     for (int i = 0; i < g_number_of_enemies; i++)

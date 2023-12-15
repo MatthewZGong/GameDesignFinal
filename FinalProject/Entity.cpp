@@ -95,7 +95,6 @@ void Entity::draw_sprite_from_texture_atlas(ShaderProgram* program, GLuint textu
 
 
 
-
 void Entity::update(float delta_time, Entity* collidable_entities, int collidable_entity_count, Map* map)
 {
     if (!m_is_active) return;
@@ -152,7 +151,6 @@ void Entity::update(float delta_time, Entity* collidable_entities, int collidabl
 
         m_is_jumping = false;
 
-        // STEP 2: The player now acquires an upward velocity
         m_velocity.y += m_jumping_power;
     }
 //    std::cout << m_collided_bottom << std::endl;
@@ -276,7 +274,15 @@ void Entity::update(float delta_time, Entity* main_spawn, std::vector<Entity*>& 
     check_collision_y(collidable_entities);
     check_collision_y(map);
     
-    
+    // ––––– JUMPING ––––– //
+    if (m_is_jumping)
+    {
+
+        m_is_jumping = false;
+
+        // STEP 2: The player now acquires an upward velocity
+        m_velocity.y += m_jumping_power;
+    }
 
     // ––––– TRANSFORMATIONS ––––– //
     m_model_matrix = glm::mat4(1.0f);
@@ -289,7 +295,6 @@ void const Entity::check_collision_x(Entity* collidable_entities, int collidable
     for (int i = 0; i < collidable_entity_count; i++)
     {
         Entity* collidable_entity = &collidable_entities[i];
-
 
 
         if (check_collision(collidable_entity))
@@ -348,6 +353,7 @@ void const Entity::check_collision_y(std::vector<Entity*>& collidable_entities)
 void Entity::render(ShaderProgram* program)
 {
     if(!m_is_active) return;
+    
     program->SetModelMatrix(m_model_matrix);
 
     if (m_animation_indices != NULL)
