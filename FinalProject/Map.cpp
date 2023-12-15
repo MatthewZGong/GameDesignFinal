@@ -1,13 +1,13 @@
-
 /**
 * Author: Matthew Gong
-* Assignment: Platformer
-* Date due: 2023-12-02, 11:59pm
+* Assignment: Scuffed Battle Simulator
+* Date due: 2023-12-15, 11:59pm
 * I pledge that I have completed this assignment without
 * collaborating with anyone else, in conformance with the
 * NYU School of Engineering Policies and Procedures on
 * Academic Misconduct.
 **/
+
 #include "Map.h"
 
 Map::Map(int width, int height, int *level_data, GLuint texture_id, float tile_size, int tile_count_x, int tile_count_y)

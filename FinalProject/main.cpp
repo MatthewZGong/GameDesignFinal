@@ -1,12 +1,13 @@
 /**
 * Author: Matthew Gong
-* Assignment: Platformer
-* Date due: 2023-12-02, 11:59pm
+* Assignment: Scuffed Battle Simulator
+* Date due: 2023-12-15, 11:59pm
 * I pledge that I have completed this assignment without
 * collaborating with anyone else, in conformance with the
 * NYU School of Engineering Policies and Procedures on
 * Academic Misconduct.
 **/
+
 
 #define GL_SILENCE_DEPRECATION
 #define LOG(argument) std::cout << argument << '\n'
@@ -144,7 +145,7 @@ void initialise()
     // Initialising both the video AND audio subsystems
     // We did something similar when we talked about video game controllers
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
-    g_display_window = SDL_CreateWindow("Rise of the AI!",
+    g_display_window = SDL_CreateWindow("Scuffed Battle Simulator",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         WINDOW_WIDTH, WINDOW_HEIGHT,
         SDL_WINDOW_OPENGL);
@@ -172,7 +173,7 @@ void initialise()
     
     // ————— Game SETUP ————— //
     g_game_paused = true;
-    g_lives = 4;
+    g_lives = 3;
     g_current_scene = new MenuScene();
     g_current_scene_type = Menu;
     g_current_scene->initialise();
