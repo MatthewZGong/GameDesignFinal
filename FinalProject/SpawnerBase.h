@@ -17,12 +17,14 @@ const char ENTITY_TILESET1_FILEPATH[] = "resources/entity_tiles.png";
 
 const char ENTITY_TILESET2_FILEPATH[] = "resources/entity_tiles_2.png";
 
-enum SoilderType { KNIGHT, ORC, SLIME, BAT };
+const char FIRE_TILESET1_FILEPATH[] = "resources/FireEffect.png";
+
+enum SoilderType { KNIGHT, ORC, SLIME, BAT, WIZARD };
 enum SpawnerAI { NO_AI, FLYING, EVERYTHING };
 
 
 class AttackEntity: public Entity{
-private:
+protected:
     int cooldown;
     int timer;
 public:
@@ -30,8 +32,17 @@ public:
     virtual void set_active(glm::vec3 position, float move_direction, std::vector<Entity*> entities);
     void render(ShaderProgram* program);
     void update(float delta_time, Entity* main_spawn, std::vector<Entity*>& collidable_entities, Map* map);
+};
 
-    
+class FireBall: public AttackEntity{
+private:
+    bool explode;
+public:
+    FireBall(int cd, float direction);
+    ~FireBall();
+    virtual void set_active(glm::vec3 position, float move_direction, std::vector<Entity*> entities);
+    void render(ShaderProgram* program);
+    void update(float delta_time, Entity* main_spawn, std::vector<Entity*>& collidable_entities, Map* map);
 };
 
 
@@ -102,18 +113,18 @@ class Bat: public BasicMelee {
 };
 
 
-//class Wizard: public Unit {
-//    protected:
-//        AttackEntity attack_entity;
-//    
-//    public:
-//    Wizard(int cd,float direction);
-//    virtual ~Wizard();
-//    void decide_action(Entity* enemy_camp,std::vector<Entity*>& enemies);
-//    void receive_attack(AttackInfo a);
-//    void render_effects(ShaderProgram* program);
-//    void update_effects(float delta_time, Entity* main_spawn, std::vector<Entity*>& collidable_entities, Map* map);
-//};
+class Wizard: public Unit {
+    protected:
+        AttackEntity* attack_entity;
+
+    public:
+    Wizard(glm::vec3 position, float direction, GLuint texture_id);
+    virtual ~Wizard();
+    void decide_action(Entity* enemy_camp,std::vector<Entity*>& enemies);
+    void receive_attack(AttackInfo a);
+    void render_effects(ShaderProgram* program);
+    void update_effects(float delta_time, Entity* main_spawn, std::vector<Entity*>& collidable_entities, Map* map);
+};
 
 class Hero: public Unit {
     private:

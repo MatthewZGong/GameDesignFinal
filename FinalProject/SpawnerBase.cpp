@@ -30,6 +30,7 @@ AttackEntity::AttackEntity(int cd, float direction){
     m_is_active = false;
     y_direction_facing = direction;
     
+    
 }
 void AttackEntity::update(float delta_time, Entity* main_spawn, std::vector<Entity*>& collidable_entities, Map* map){
 
@@ -343,6 +344,11 @@ void SpawnerBase::spawn(SoilderType st){
         gold -= 10;
         soldiers.push_back(new Knight(m_position, y_direction_facing, unit_texture_id));
     }
+    else if(st == WIZARD){
+        if(gold < 50) return;
+        gold -= 50;
+        soldiers.push_back(new Wizard(m_position, y_direction_facing, unit_texture_id));
+    }
     else if(st == ORC)
         soldiers.push_back(new Orc(m_position, y_direction_facing, unit_texture_id));
     else if(st == SLIME)
@@ -609,4 +615,226 @@ void Bat::decide_action(Entity* enemy_camp, std::vector<Entity*>&
     if( m_position.y > enemy_camp->get_position().y+0.75 && glm::distance(m_position, enemy_camp->get_position())  < 3.0 ){
         m_movement.y = -0.5f;
     }
+}
+
+
+Wizard::Wizard(glm::vec3 position, float direction, GLuint texture_id){
+    attack_range = 3.0f;
+    worth = 30;
+    health = 20;
+    m_texture_id = texture_id;
+    move_direction = float(direction);
+    y_direction_facing = float(direction);
+    Entity::set_position(position);
+    Entity::set_movement(glm::vec3(0.0f));
+    Entity::set_speed(0.8f);
+    Entity::set_acceleration(glm::vec3(0.0f, -9.81f, 0.0f));
+    m_animation_cols = 32;
+    m_animation_rows = 32;
+    m_animation_indices = new int[4] {360,361,365,366};
+    m_animation_hat = new int[4] {328,329,333,334};
+    m_animation_frames = 4;
+    m_animation_index = 0;
+    m_animation_time = 0.0f;
+    m_width = 0.8f;
+    m_height = 0.8f;
+    attack_entity = new FireBall(10,direction);
+    attack_entity->attackInfo = {100, 0.3};
+}
+Wizard::~Wizard(){
+    delete attack_entity;
+}
+
+
+
+
+void Wizard::receive_attack(AttackInfo a)
+{
+    health -= a.dmg;
+    m_position.x += -(move_direction)*a.knock_back;
+    if(health < 0){
+        health = 0;
+    }
+    
+}
+
+void Wizard::decide_action(Entity* enemy_camp, std::vector<Entity*>&
+                           enemies)
+{
+    if(!m_is_active || health <= 0) return;
+    m_movement = glm::vec3(0.0);
+    Entity* closest = NULL;
+    float distances = 1e9;
+    if(enemy_camp != NULL && enemy_camp->get_active())
+    {
+        closest = enemy_camp;
+        auto [left,right] =enemy_camp->get_x_boundary();
+        distances = glm::distance(m_position, left);
+        distances = fmin(distances, glm::distance(m_position, right));
+    }
+    for(Entity* e: enemies)
+    {
+        if(e->get_active())
+        {
+
+            auto [left,right] = e->get_x_boundary();
+            float cur_dist = glm::distance(m_position, left);
+            cur_dist =  fmin(cur_dist, glm::distance(m_position, right));
+            if(cur_dist < distances){
+                distances = cur_dist;
+                closest = e;
+            }
+        }
+    }
+//    std::cout << distances << std::endl;
+    if(distances < attack_range){
+        if(!attack_entity->get_active()){
+            attack_entity->set_active(m_position,move_direction,  {closest});
+
+        }
+    }else{
+        m_movement.x = 1.0*move_direction;
+    }
+    
+}
+void Wizard::render_effects(ShaderProgram *program)
+{
+//    std::cout << "i am rendering" << std::endl;
+    
+    attack_entity->render(program);
+}
+
+void Wizard::update_effects(float delta_time, Entity* main_spawn, std::vector<Entity*>& collidable_entities, Map* map){
+    attack_entity->update(delta_time, main_spawn, collidable_entities, map);
+};
+
+FireBall::~FireBall(){
+    delete death_animation;
+}
+FireBall::FireBall(int cd, float direction): AttackEntity(cd, direction){
+    attackInfo = {100, 0.2};
+    cooldown = cd;
+    timer = 0;
+    m_texture_id = Utility::load_texture(FIRE_TILESET1_FILEPATH);
+    m_animation_cols    = 36;
+    m_animation_rows    = 13;
+    if(m_animation_indices != NULL)
+        delete m_animation_indices;
+    m_animation_indices = new int[5] {24,25,26,27,28};
+    m_animation_frames  = 3;
+    m_animation_index   = 0;
+    m_animation_time    = 0.0f;
+    m_is_active = false;
+    y_direction_facing = direction;
+    
+    m_speed = 2.0;
+    death_animation = new AnimationInfo;
+    death_animation->index = 0;
+    death_animation->animation_rows = 13;
+    death_animation->animation_cols = 36;
+    death_animation->animation_indices = {66, 67, 68, 69, 70, 71};
+    death_animation->texture = m_texture_id;
+    explode = false;
+    
+    
+}
+void FireBall::update(float delta_time, Entity* main_spawn, std::vector<Entity*>& collidable_entities, Map* map){
+
+    // ––––– ANIMATION ––––– //
+    if(!explode)
+        m_movement.x = y_direction_facing*1.0;
+    bool hit = check_collision(main_spawn);
+    for(Entity* e: collidable_entities){
+        hit = hit || check_collision(e);
+    }
+    if(hit && !explode){
+        for(Entity* e: collidable_entities){
+            if(check_collision(e)){
+                e->receive_attack(attackInfo);
+            }
+        }
+        if (check_collision(main_spawn)){
+            main_spawn->receive_attack(attackInfo);
+        }
+        explode = true;
+    }
+    
+    if (explode)
+    {
+        m_animation_time += delta_time;
+        float frames_per_second = (float)1 / SECONDS_PER_FRAME;
+
+        if (m_animation_time >= frames_per_second)
+        {
+            death_animation->index++;
+            timer--;
+            timer = fmax(0, timer);
+        }
+        if(death_animation->index >= death_animation->animation_indices.size()){
+            m_is_active = false;
+        }
+        m_model_matrix = glm::mat4(1.0f);
+        m_model_matrix = glm::translate(m_model_matrix, m_position);
+    
+        return;
+    }
+
+    
+    // ––––– ANIMATION ––––– //
+    if (m_animation_indices != NULL)
+    {
+        //there is a better way of doing this but im lazy
+        if (glm::length(m_movement) != 0 || m_animation_index != 0)
+        {
+            m_animation_time += delta_time;
+            float frames_per_second = (float)1 / SECONDS_PER_FRAME;
+
+            if (m_animation_time >= frames_per_second)
+            {
+                m_animation_time = 0.0f;
+                m_animation_index++;
+                timer--;
+                timer = fmax(0, timer);
+                if (m_animation_index >= m_animation_frames)
+                {
+                    
+                    m_animation_index = 0;
+                }
+            }
+        }
+    }
+    m_velocity.x = m_movement.x * m_speed;
+    m_position.x += m_velocity.x * delta_time;
+
+    m_model_matrix = glm::mat4(1.0f);
+    m_model_matrix = glm::translate(m_model_matrix, m_position);
+}
+void FireBall::render(ShaderProgram* program){
+    if(!m_is_active) return;
+    if(explode){
+        program->SetModelMatrix(m_model_matrix);
+        std::swap(m_animation_rows, death_animation->animation_rows);
+        std::swap(m_animation_cols, death_animation->animation_cols);
+        draw_sprite_from_texture_atlas(program, death_animation->texture, death_animation->animation_indices[death_animation->index]);
+        std::swap(m_animation_rows, death_animation->animation_rows);
+        std::swap(m_animation_cols, death_animation->animation_cols);
+        return;
+    }
+    Entity::render(program);
+}
+
+void FireBall::set_active(glm::vec3 position, float move_direction, std::vector<Entity*> attacking){
+    if(timer != 0) return;
+    y_direction_facing = move_direction;
+    m_is_active = true;
+    explode = false;
+    m_animation_index = 0;
+    m_position = position;
+    m_movement.x = move_direction*1.0;
+    death_animation->index = 0;
+    timer = cooldown;
+//    for(Entity* e: attacking){
+//        e->receive_attack(attackInfo);
+//    }
+
 }

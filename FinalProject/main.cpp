@@ -221,6 +221,10 @@ void process_input()
                     if(g_current_scene_type != Menu && g_current_scene_type != End)
                         g_current_scene->g_game_state.player1->spawn(KNIGHT);
                 break;
+            case SDLK_2:
+                    if(g_current_scene_type != Menu && g_current_scene_type != End)
+                        g_current_scene->g_game_state.player1->spawn(WIZARD);
+                break;
 
             case SDLK_SPACE:
                 if (!g_game_paused && g_current_scene->g_game_state.player->m_collided_bottom)
