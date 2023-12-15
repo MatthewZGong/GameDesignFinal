@@ -1,4 +1,4 @@
-/**/**
+/**
 * Author: Matthew Gong
 * Assignment: Scuffed Battle Simulator
 * Date due: 2023-12-15, 11:59pm
