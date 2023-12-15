@@ -17,6 +17,8 @@
 		B38C6B9B2AF81BBA00646826 /* Entity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B38C6B9A2AF81BBA00646826 /* Entity.cpp */; };
 		B3D035212B06BF2D004A27D6 /* Map.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B3D0351F2B06BF2D004A27D6 /* Map.cpp */; };
 		B3D5B9B02B2A9BC600E71D02 /* SpawnerBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B3D5B9AE2B2A9BC600E71D02 /* SpawnerBase.cpp */; };
+		B3D5B9B32B2C2ACB00E71D02 /* LevelC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B3D5B9B12B2C2ACB00E71D02 /* LevelC.cpp */; };
+		B3D5B9B62B2C33FB00E71D02 /* LevelD.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B3D5B9B42B2C33FB00E71D02 /* LevelD.cpp */; };
 		B3FA39FE2B1BB72600161F14 /* resources in Copy Files */ = {isa = PBXBuildFile; fileRef = B38C6B962AF6EC1F00646826 /* resources */; };
 		B3FA39FF2B1BB72A00161F14 /* shaders in Copy Files */ = {isa = PBXBuildFile; fileRef = B38C6B902AF6EBEB00646826 /* shaders */; };
 		B3FA3A022B1BBF5C00161F14 /* Utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B3FA3A012B1BBF5C00161F14 /* Utility.cpp */; };
@@ -62,6 +64,10 @@
 		B3D035222B06BF77004A27D6 /* Map.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Map.h; sourceTree = "<group>"; };
 		B3D5B9AE2B2A9BC600E71D02 /* SpawnerBase.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SpawnerBase.cpp; sourceTree = "<group>"; };
 		B3D5B9AF2B2A9BC600E71D02 /* SpawnerBase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SpawnerBase.h; sourceTree = "<group>"; };
+		B3D5B9B12B2C2ACB00E71D02 /* LevelC.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LevelC.cpp; sourceTree = "<group>"; };
+		B3D5B9B22B2C2ACB00E71D02 /* LevelC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LevelC.h; sourceTree = "<group>"; };
+		B3D5B9B42B2C33FB00E71D02 /* LevelD.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LevelD.cpp; sourceTree = "<group>"; };
+		B3D5B9B52B2C33FB00E71D02 /* LevelD.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LevelD.h; sourceTree = "<group>"; };
 		B3FA3A002B1BBF5C00161F14 /* Utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utility.h; sourceTree = "<group>"; };
 		B3FA3A012B1BBF5C00161F14 /* Utility.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Utility.cpp; sourceTree = "<group>"; };
 		B3FA3A032B1BC1C300161F14 /* Scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Scene.cpp; sourceTree = "<group>"; };
@@ -137,6 +143,10 @@
 				B3FA3A102B1BF4A300161F14 /* EndScreen.h */,
 				B3D5B9AE2B2A9BC600E71D02 /* SpawnerBase.cpp */,
 				B3D5B9AF2B2A9BC600E71D02 /* SpawnerBase.h */,
+				B3D5B9B12B2C2ACB00E71D02 /* LevelC.cpp */,
+				B3D5B9B22B2C2ACB00E71D02 /* LevelC.h */,
+				B3D5B9B42B2C33FB00E71D02 /* LevelD.cpp */,
+				B3D5B9B52B2C33FB00E71D02 /* LevelD.h */,
 			);
 			path = FinalProject;
 			sourceTree = "<group>";
@@ -212,6 +222,7 @@
 			files = (
 				B3FA3A052B1BC1C400161F14 /* Scene.cpp in Sources */,
 				B315C6822AF6E96000942216 /* main.cpp in Sources */,
+				B3D5B9B32B2C2ACB00E71D02 /* LevelC.cpp in Sources */,
 				B38C6B9B2AF81BBA00646826 /* Entity.cpp in Sources */,
 				B3D5B9B02B2A9BC600E71D02 /* SpawnerBase.cpp in Sources */,
 				B3FA3A192B1C25EC00161F14 /* Effects.cpp in Sources */,
@@ -221,6 +232,7 @@
 				B3D035212B06BF2D004A27D6 /* Map.cpp in Sources */,
 				B3FA3A0E2B1BE35600161F14 /* MenuScene.cpp in Sources */,
 				B38C6B932AF6EBEC00646826 /* ShaderProgram.cpp in Sources */,
+				B3D5B9B62B2C33FB00E71D02 /* LevelD.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

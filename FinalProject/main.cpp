@@ -34,6 +34,8 @@
 
 #include "Scene.h"
 #include "LevelB.h"
+#include "LevelC.h"
+#include "LevelD.h"
 #include "MenuScene.h"
 #include "EndScreen.h"
 #include "Effects.h"
@@ -95,6 +97,12 @@ void switch_scenes(SceneType next){
             break;
         case Level1:
             g_current_scene = new LevelB();
+            break;
+        case Level2:
+            g_current_scene = new LevelC();
+            break;
+        case Level3:
+            g_current_scene = new LevelD();
             break;
         case End:
             g_current_scene = new EndScreen(g_lives);
@@ -208,6 +216,10 @@ void process_input()
                     if(g_current_scene->g_game_state.player2 != NULL)
                     g_current_scene->g_game_state.player->attack(g_current_scene->g_game_state.player2, g_current_scene->g_game_state.player2->get_soilders());
                 break;
+            case SDLK_1:
+                    if(g_current_scene_type != Menu && g_current_scene_type != End)
+                        g_current_scene->g_game_state.player1->spawn(KNIGHT);
+                break;
 
             case SDLK_SPACE:
                 if (!g_game_paused && g_current_scene->g_game_state.player->m_collided_bottom)
@@ -291,28 +303,28 @@ void update()
    
 }
 
-void print_lives(){
+void make_ui(){
     if(g_current_scene_type == Menu || g_current_scene_type == End) return;
 //    std::cout << "GOT HERE" << std::endl;
     Utility::draw_text(&g_shader_program,font_texture_id, "Lives: "+std::to_string(g_lives), 0.55f, -0.2f, glm::vec3(g_current_scene->g_game_state.player->get_position().x+-4.9,3.0,0.0));
+    Utility::draw_text(&g_shader_program,font_texture_id, "Gold:"+std::to_string(g_current_scene->g_game_state.player1->get_gold()), 0.55f, -0.2f, glm::vec3(g_current_scene->g_game_state.player->get_position().x+2.3,3.0,0.0));
 }
 void print_pause_screen(){
     if(g_current_scene_type == Menu || g_current_scene_type == End) return;
     Utility::draw_text(&g_shader_program,font_texture_id, "Scuffed Platformer", 0.55f, 0.0001f, glm::vec3(g_current_scene->g_game_state.player->get_position().x+-4.9,1.0,0.0));
     Utility::draw_text(&g_shader_program,font_texture_id, "Press Enter To Play", 0.5f, 0.0001f, glm::vec3(-4.5,0.0,0.0));
+
 }
 void render()
 
 {
     
-
-
     g_shader_program.SetViewMatrix(g_view_matrix);
     glClear(GL_COLOR_BUFFER_BIT);
 
     g_current_scene->render(&g_shader_program);
     
-    print_lives();
+    make_ui();
     if(g_game_paused)
         print_pause_screen();
     g_effects->render();

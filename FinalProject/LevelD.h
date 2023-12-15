@@ -9,19 +9,20 @@
 **/
 #include "Scene.h"
 
-class LevelB : public Scene {
+class LevelD : public Scene {
 public:
     // ————— STATIC ATTRIBUTES ————— //
     
     
-    LevelB();
+    LevelD();
     // ————— CONSTRUCTOR ————— //
-    ~LevelB();
+    ~LevelD();
     
     // ————— METHODS ————— //
     void initialise() override;
     void update(float delta_time) override;
     void render(ShaderProgram *program) override;
+
 
     
 };

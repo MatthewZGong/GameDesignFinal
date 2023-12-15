@@ -230,6 +230,7 @@ SpawnerBase::SpawnerBase(bool forward, int h)
     unit_texture_id = Utility::load_texture(ENTITY_TILESET1_FILEPATH);
     m_width = 1.5;
     health = h;
+    gold = 0;
     
 }
 SpawnerBase::~SpawnerBase(){
@@ -238,7 +239,32 @@ SpawnerBase::~SpawnerBase(){
     }
 }
 
+void SpawnerBase::ai_action(){
+    if(aitype == FLYING){
+        if(frames_alive%100 == 0){
+            spawn(BAT);
+        }
+        if(frames_alive%600 == 0){
+            spawn(ORC);
+        }
 
+    }else if(aitype == EVERYTHING){
+        int r = -1;
+        if(frames_alive%333 == 0){
+            int r = (rand()%3);
+        }
+        if(r == 0 || frames_alive%200 == 0){
+            spawn(SLIME);
+        }
+        if(r == 1 || frames_alive%500 == 0){
+            spawn(BAT);
+        }
+        if(r == 2 || frames_alive%1000 == 0){
+            spawn(ORC);
+        }
+
+    }
+}
 void SpawnerBase::update(float delta_time, SpawnerBase* EnemyCamp, Map* map){
     
     std::vector<Entity*>& enemies = EnemyCamp->get_soilders();
@@ -255,7 +281,8 @@ void SpawnerBase::update(float delta_time, SpawnerBase* EnemyCamp, Map* map){
     m_model_matrix = glm::translate(m_model_matrix, m_position);
     std::vector<Entity*> temp;
     Unit::update(delta_time, EnemyCamp, temp, map);
-//    std::cout << "GOLD: " << gold << " " << y_direction_facing << std::endl;
+    ai_action();
+    frames_alive++;
 }
 void SpawnerBase::draw_sprite_from_texture_atlas(ShaderProgram* program, GLuint texture_id, int index)
 {
@@ -307,8 +334,11 @@ void SpawnerBase::render(ShaderProgram* program){
 }
 
 void SpawnerBase::spawn(SoilderType st){
-    if(st == KNIGHT)
+    if(st == KNIGHT){
+        if(gold < 10) return;
+        gold -= 10;
         soldiers.push_back(new Knight(m_position, y_direction_facing, unit_texture_id));
+    }
     else if(st == ORC)
         soldiers.push_back(new Orc(m_position, y_direction_facing, unit_texture_id));
     else if(st == SLIME)
@@ -511,7 +541,7 @@ Bat::Bat(glm::vec3 position, float direction, GLuint texture_id): BasicMelee(4, 
 {
     
     attack_range = 0.8f;
-    worth = 2;
+    worth = 5;
     health = 20;
     m_texture_id = texture_id;
     move_direction = float(direction);

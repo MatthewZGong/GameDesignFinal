@@ -7,7 +7,7 @@
 * NYU School of Engineering Policies and Procedures on
 * Academic Misconduct.
 **/
-#include "LevelB.h"
+#include "LevelC.h"
 #include "Utility.h"
 
 
@@ -16,23 +16,22 @@
 const int E = -1;
 
 
-int LEVEL_B_DATA[] =
+int LEVEL_C_DATA[] =
 {
     E, E, E, E, E, E, E, E, E, E, E, E, E, E, E,
-    E, E, E, E, E, E, E, E, E, E, E, E, E, E, E,
+    E, E, E, E, E, 1, 2, 2, 3, E, E, E, E, E, E,
     E, E, E, E, E, E, E, E, E, E, E, E, E, E, E,
     21, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 23,
     4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4
 };
 
-LevelB::LevelB(){
-    g_number_of_enemies = 0;
-    g_game_state.next_scene_id = Level2;
+LevelC::LevelC(){
+    g_game_state.next_scene_id = Level3;
     g_game_state.state = 0;
 
 }
 
-LevelB::~LevelB()
+LevelC::~LevelC()
 {
     delete [] g_game_state.enemies;
 //    delete    g_game_state.player;
@@ -43,14 +42,14 @@ LevelB::~LevelB()
     Mix_FreeMusic(g_game_state.bgm);
 }
 
-void LevelB::initialise()
+void LevelC::initialise()
 {
   
     g_game_state.state = 0;
 
     // ————— MAP SET-UP ————— //
     GLuint map_texture_id = Utility::load_texture(MAP_TILESET_FILEPATH);
-    g_game_state.map = new Map(LEVEL_WIDTH, LEVEL_HEIGHT, LEVEL_B_DATA, map_texture_id, 1.0f, 20, 9);
+    g_game_state.map = new Map(LEVEL_WIDTH, LEVEL_HEIGHT, LEVEL_C_DATA, map_texture_id, 1.0f, 20, 9);
     GLuint sprite_tileset_texture_id = Utility::load_texture(SPRITE_TILESET_FILEPATH);
     GLuint entity_tileset_texture_id = Utility::load_texture(ENTITY_1_TILESET_FILEPATH);
 
@@ -72,7 +71,7 @@ void LevelB::initialise()
 
 
     
-    g_game_state.player2 = new SpawnerBase(false, 100);
+    g_game_state.player2 = new SpawnerBase(false, 300);
     g_game_state.player2->set_position(glm::vec3(13.5f, -1.5f, 0.0f));
     g_game_state.player2->set_movement(glm::vec3(0.0f));
     g_game_state.player2->m_texture_id = entity_tileset_texture_id;
@@ -86,8 +85,9 @@ void LevelB::initialise()
     g_game_state.player2->m_animation_time    = 0.0f;
 
 
-    g_game_state.player2->spawn(ORC);
-    g_game_state.player2->spawn(SLIME);
+    g_game_state.player2->setSpawnerAi(FLYING);
+//    g_game_state.player2->spawn(ORC);
+//    g_game_state.player2->spawn(SLIME);
     // ––––– PLAYER ––––– //
     // Existing
 
@@ -110,16 +110,15 @@ void LevelB::initialise()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void LevelB::update(float delta_time)
+void LevelC::update(float delta_time)
 {
     g_game_state.player1->update(delta_time, g_game_state.player2, g_game_state.map);
     g_game_state.player2->update(delta_time, g_game_state.player1, g_game_state.map);
-
     
 }
 
 
-void LevelB::render(ShaderProgram *program)
+void LevelC::render(ShaderProgram *program)
 {
     g_game_state.map->render(program);
 //    g_game_state.player->render(program);

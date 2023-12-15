@@ -39,6 +39,8 @@ protected:
     
     int gold;
     int gold_generation;
+    size_t frames_alive = 0;
+
     bool m_is_active = true;
     float y_direction_facing = 1.0f;
 
@@ -183,4 +185,5 @@ public:
     void const set_y_facing_direction(float dir)                 { y_direction_facing = dir;};
     
     void addGold(int amount){gold += amount;};
+    int get_gold(){ return gold;};
 };

@@ -246,7 +246,6 @@ void Entity::update(float delta_time, Entity* main_spawn, std::vector<Entity*>& 
             {
                 m_animation_time = 0.0f;
                 m_animation_index++;
-
                 if (m_animation_index >= m_animation_frames)
                 {
                     m_animation_index = 0;

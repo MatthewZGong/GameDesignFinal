@@ -18,7 +18,7 @@ const char ENTITY_TILESET1_FILEPATH[] = "resources/entity_tiles.png";
 const char ENTITY_TILESET2_FILEPATH[] = "resources/entity_tiles_2.png";
 
 enum SoilderType { KNIGHT, ORC, SLIME, BAT };
-enum SpawnerAI { TUTORIAL, FLYING, EVERYTHING };
+enum SpawnerAI { NO_AI, FLYING, EVERYTHING };
 
 
 class AttackEntity: public Entity{
@@ -43,6 +43,7 @@ protected:
     float move_direction;
     float attack_range;
     int worth;
+
 
 public:
     Unit();
@@ -122,7 +123,8 @@ class SpawnerBase: public Unit
     private:
         std::vector<Entity*> soldiers;
         GLuint unit_texture_id;
-        SpawnerAI aitype;
+        SpawnerAI aitype = NO_AI;
+        void ai_action();
 
     public:
         SpawnerBase(bool forward, int h);
@@ -131,6 +133,7 @@ class SpawnerBase: public Unit
         void update(float delta_time, SpawnerBase* EnemyCamp, Map* map);
         void render(ShaderProgram* program);
         void render_attacks(ShaderProgram* program);
+        
         void draw_sprite_from_texture_atlas(ShaderProgram* program, GLuint texture_id, int index);
         void spawn(SoilderType st);
         void receive_attack(AttackInfo a);
