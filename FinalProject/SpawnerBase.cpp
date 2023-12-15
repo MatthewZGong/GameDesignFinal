@@ -267,7 +267,10 @@ void SpawnerBase::ai_action(){
         if(r == 2 || frames_alive%700 == 0){
             spawn(ORC);
         }
-
+    }else if(aitype == TUTORIAL){
+        if(frames_alive%1000 == 0){
+            spawn(ORC);
+        }
     }
 }
 void SpawnerBase::update(float delta_time, SpawnerBase* EnemyCamp, Map* map){
@@ -345,8 +348,8 @@ void SpawnerBase::spawn(SoilderType st){
         soldiers.push_back(new Knight(m_position, y_direction_facing, unit_texture_id));
     }
     else if(st == WIZARD){
-        if(gold < 0) return;
-        gold -= 0;
+        if(gold < 25) return;
+        gold -= 25;
         soldiers.push_back(new Wizard(m_position, y_direction_facing, unit_texture_id));
     }
     else if(st == ORC)
@@ -355,6 +358,8 @@ void SpawnerBase::spawn(SoilderType st){
         soldiers.push_back(new Slime(m_position, y_direction_facing, unit_texture_id));
     else if(st == BAT)
         soldiers.push_back(new Bat(m_position, y_direction_facing, unit_texture_id));
+    else if(st == CHEAT)
+        soldiers.push_back(new Wizard(m_position, y_direction_facing, unit_texture_id));
 }
 
 void SpawnerBase::receive_attack(AttackInfo a){

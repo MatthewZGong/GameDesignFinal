@@ -85,8 +85,9 @@ void LevelB::initialise()
     g_game_state.player2->m_animation_time    = 0.0f;
 
 
-    g_game_state.player2->spawn(ORC);
+//    g_game_state.player2->spawn(ORC);
     g_game_state.player2->spawn(SLIME);
+    g_game_state.player2->setSpawnerAi(TUTORIAL);
     // ––––– PLAYER ––––– //
     // Existing
 

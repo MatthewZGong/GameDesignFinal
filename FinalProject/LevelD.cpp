@@ -73,13 +73,13 @@ void LevelD::initialise()
     g_game_state.player2 = new SpawnerBase(false, 300);
     g_game_state.player2->set_position(glm::vec3(18.5f, -1.5f, 0.0f));
     g_game_state.player2->set_movement(glm::vec3(0.0f));
-    g_game_state.player2->m_texture_id = entity_tileset_texture_id;
+    g_game_state.player2->m_texture_id =  castle_tileset_texture_id;
     g_game_state.player2->set_entity_type(PLAYER);
 
-    g_game_state.player2->m_animation_cols    = 32;
-    g_game_state.player2->m_animation_rows    = 32;
-    g_game_state.player2->m_animation_indices = new int[3] {168,174, 175};
-    g_game_state.player2->m_animation_frames  = 3;
+    g_game_state.player2->m_animation_cols    = 11;
+    g_game_state.player2->m_animation_rows    = 27;
+    g_game_state.player2->m_animation_indices = new int[1] {89};
+    g_game_state.player2->m_animation_frames  = 1;
     g_game_state.player2->m_animation_index   = 0;
     g_game_state.player2->m_animation_time    = 0.0f;
 

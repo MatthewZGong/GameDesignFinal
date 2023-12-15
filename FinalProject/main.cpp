@@ -77,7 +77,7 @@ Effects* g_effects;
 SDL_Window* g_display_window;
 bool g_game_is_running = true;
 bool g_game_paused = true;
-int g_lives = 3;
+int g_lives = 4;
 SceneType g_current_scene_type;
 ShaderProgram g_shader_program;
 glm::mat4 g_view_matrix, g_projection_matrix;
@@ -172,7 +172,7 @@ void initialise()
     
     // ————— Game SETUP ————— //
     g_game_paused = true;
-    g_lives = 3;
+    g_lives = 4;
     g_current_scene = new MenuScene();
     g_current_scene_type = Menu;
     g_current_scene->initialise();
@@ -224,6 +224,10 @@ void process_input()
             case SDLK_2:
                     if(g_current_scene_type != Menu && g_current_scene_type != End)
                         g_current_scene->g_game_state.player1->spawn(WIZARD);
+                break;
+            case SDLK_9:
+                    if(g_current_scene_type != Menu && g_current_scene_type != End)
+                        g_current_scene->g_game_state.player1->spawn(CHEAT);
                 break;
 
             case SDLK_SPACE:

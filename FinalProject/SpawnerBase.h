@@ -21,8 +21,8 @@ const char FIRE_TILESET1_FILEPATH[] = "resources/FireEffect.png";
 
 const char CASTLE_TILESET1_FILEPATH[] = "resources/CastleTile.png";
 
-enum SoilderType { KNIGHT, ORC, SLIME, BAT, WIZARD };
-enum SpawnerAI { NO_AI, FLYING, EVERYTHING };
+enum SoilderType { KNIGHT, ORC, SLIME, BAT, WIZARD, CHEAT };
+enum SpawnerAI { NO_AI, FLYING, EVERYTHING, TUTORIAL };
 
 
 class AttackEntity: public Entity{
