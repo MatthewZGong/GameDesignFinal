@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "B315C67D2AF6E96000942216"
-               BuildableName = "Lunar-Lander"
+               BuildableName = "FinalProject"
                BlueprintName = "FinalProject"
                ReferencedContainer = "container:FinalProject.xcodeproj">
             </BuildableReference>
@@ -45,7 +45,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B315C67D2AF6E96000942216"
-            BuildableName = "Lunar-Lander"
+            BuildableName = "FinalProject"
             BlueprintName = "FinalProject"
             ReferencedContainer = "container:FinalProject.xcodeproj">
          </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B315C67D2AF6E96000942216"
-            BuildableName = "Lunar-Lander"
+            BuildableName = "FinalProject"
             BlueprintName = "FinalProject"
             ReferencedContainer = "container:FinalProject.xcodeproj">
          </BuildableReference>

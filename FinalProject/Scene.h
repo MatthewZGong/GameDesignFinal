@@ -45,7 +45,6 @@ struct GameState
     // ————— GAME OBJECTS ————— //
     Map *map;
     Hero *player;
-    Entity *enemies;
     
     SpawnerBase* player1;
     SpawnerBase* player2;

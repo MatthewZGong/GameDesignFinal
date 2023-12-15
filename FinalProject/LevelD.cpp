@@ -19,7 +19,7 @@ const int E = -1;
 int LEVEL_D_DATA[] =
 {
     E, E, E, E, E, E, E, E, E, E, E, E, E, E, E,
-    E, E, E, E, E, 1, 2, 2, 3, E, E, E, E, E, E,
+    E, E, E, 0, E, 0, E, 0, E, 0, E, E, E, E, E,
     E, E, E, E, E, E, E, E, E, E, E, E, E, E, E,
     21, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 23,
     4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4
@@ -33,7 +33,6 @@ LevelD::LevelD(){
 
 LevelD::~LevelD()
 {
-    delete [] g_game_state.enemies;
 //    delete    g_game_state.player;
     delete    g_game_state.map;
     delete g_game_state.player2;

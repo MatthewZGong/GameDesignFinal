@@ -34,7 +34,6 @@ LevelB::LevelB(){
 
 LevelB::~LevelB()
 {
-    delete [] g_game_state.enemies;
 //    delete    g_game_state.player;
     delete    g_game_state.map;
     delete g_game_state.player2;

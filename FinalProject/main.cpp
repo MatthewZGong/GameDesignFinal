@@ -115,6 +115,7 @@ void switch_scenes(SceneType next){
 }
 void manage_scene()
 {
+    
     if(g_game_paused)
         return;
     
@@ -308,11 +309,13 @@ void make_ui(){
 //    std::cout << "GOT HERE" << std::endl;
     Utility::draw_text(&g_shader_program,font_texture_id, "Lives: "+std::to_string(g_lives), 0.55f, -0.2f, glm::vec3(g_current_scene->g_game_state.player->get_position().x+-4.9,3.0,0.0));
     Utility::draw_text(&g_shader_program,font_texture_id, "Gold:"+std::to_string(g_current_scene->g_game_state.player1->get_gold()), 0.55f, -0.2f, glm::vec3(g_current_scene->g_game_state.player->get_position().x+2.3,3.0,0.0));
+    Utility::draw_text(&g_shader_program,font_texture_id, "health:"+std::to_string(g_current_scene->g_game_state.player->get_health()), 0.55f, -0.2f, glm::vec3(g_current_scene->g_game_state.player->get_position().x-1.7,3.0,0.0));
 }
 void print_pause_screen(){
     if(g_current_scene_type == Menu || g_current_scene_type == End) return;
     Utility::draw_text(&g_shader_program,font_texture_id, "Scuffed Platformer", 0.55f, 0.0001f, glm::vec3(g_current_scene->g_game_state.player->get_position().x+-4.9,1.0,0.0));
     Utility::draw_text(&g_shader_program,font_texture_id, "Press Enter To Play", 0.5f, 0.0001f, glm::vec3(-4.5,0.0,0.0));
+    
 
 }
 void render()

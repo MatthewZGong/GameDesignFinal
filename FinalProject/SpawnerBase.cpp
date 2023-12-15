@@ -101,6 +101,10 @@ Unit::Unit(){
     death_animation->animation_cols = 28;
     death_animation->animation_indices = {62, 63, 64, 65};
     death_animation->texture = Utility::load_texture(ENTITY_TILESET2_FILEPATH);
+    m_position = glm::vec3(0.0f, 300.0f, 0.0f);
+    m_model_matrix = glm::translate(glm::mat4(1.0f), m_position);
+    
+    
 }
 
 void Unit::update(float delta_time, Entity* main_spawn, std::vector<Entity*>& collidable_entities, Map* map){
@@ -244,7 +248,7 @@ void SpawnerBase::ai_action(){
         if(frames_alive%100 == 0){
             spawn(BAT);
         }
-        if(frames_alive%600 == 0){
+        if(frames_alive%1000 == 0){
             spawn(ORC);
         }
 

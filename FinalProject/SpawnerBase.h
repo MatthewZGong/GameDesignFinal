@@ -50,6 +50,7 @@ public:
     virtual ~Unit();
     void update(float delta_time, Entity* main_spawn, std::vector<Entity*>& collidable_entities, Map* map);
     void render(ShaderProgram* program);
+    int get_health(){return health;};
 
 
 };
@@ -101,6 +102,18 @@ class Bat: public BasicMelee {
 };
 
 
+//class Wizard: public Unit {
+//    protected:
+//        AttackEntity attack_entity;
+//    
+//    public:
+//    Wizard(int cd,float direction);
+//    virtual ~Wizard();
+//    void decide_action(Entity* enemy_camp,std::vector<Entity*>& enemies);
+//    void receive_attack(AttackInfo a);
+//    void render_effects(ShaderProgram* program);
+//    void update_effects(float delta_time, Entity* main_spawn, std::vector<Entity*>& collidable_entities, Map* map);
+//};
 
 class Hero: public Unit {
     private:
